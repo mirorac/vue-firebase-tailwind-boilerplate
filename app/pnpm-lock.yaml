@@ -29,6 +29,9 @@ importers:
       firebase:
         specifier: ^11.0.1
         version: 11.0.1
+      pinia:
+        specifier: ^2.3.1
+        version: 2.3.1(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
       vue:
         specifier: ^3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -2272,6 +2275,15 @@ packages:
   pify@3.0.0:
     resolution: {integrity: sha512-C3FsVNH1udSEX48gGX1xfvwTWfsYWj5U+8/uK15BGzIGrKoUpghX8hWZwa/OFnakBiiVNmBvemTJR5mcy7iPcg==}
     engines: {node: '>=4'}
+
+  pinia@2.3.1:
+    resolution: {integrity: sha512-khUlZSwt9xXCaTbbxFYBKDc/bWAGWJjOgvxETwkTN7KRm66EeT1ZdZj6i2ceh9sP2Pzqsbc704r2yngBrxBVug==}
+    peerDependencies:
+      typescript: '>=4.4.4'
+      vue: ^2.7.0 || ^3.5.11
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   pirates@4.0.6:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
@@ -5380,6 +5392,16 @@ snapshots:
   pify@2.3.0: {}
 
   pify@3.0.0: {}
+
+  pinia@2.3.1(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3)):
+    dependencies:
+      '@vue/devtools-api': 6.6.4
+      vue: 3.5.12(typescript@5.6.3)
+      vue-demi: 0.14.10(vue@3.5.12(typescript@5.6.3))
+    optionalDependencies:
+      typescript: 5.6.3
+    transitivePeerDependencies:
+      - '@vue/composition-api'
 
   pirates@4.0.6: {}
 
