@@ -7,7 +7,15 @@ import type {
   QuestionBundle,
 } from '@/types/questions'
 import { useUserStore } from '@/stores/user'
-import { addDoc, onSnapshot, query, where } from 'firebase/firestore'
+import {
+  addDoc,
+  doc,
+  onSnapshot,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
+} from 'firebase/firestore'
 import { acquiredBundlesCollection } from '~/plugins/firebase/db'
 import type { LinkedUsers } from '~/types/users'
 
@@ -224,6 +232,20 @@ export const useQuestionBundlesStore = defineStore('questionBundles', () => {
     }
   }
 
+  const updateAnswer = async (
+    acquiredBundleId: string,
+    questionId: string,
+    answer: string
+  ) => {
+    const bundleDoc = doc(acquiredBundlesCollection, acquiredBundleId)
+    updateDoc(bundleDoc, {
+      [`bundle.questions.${questionId}.answers.${user.id}`]: {
+        answer,
+        createdAt: serverTimestamp(),
+      },
+    })
+  }
+
   const syncAcquiredBundles = async () => {
     await user.untilLinked()
     const q = query(
@@ -278,5 +300,6 @@ export const useQuestionBundlesStore = defineStore('questionBundles', () => {
     acquire,
     isAcquired,
     getMatches,
+    updateAnswer,
   }
 })

@@ -5,7 +5,7 @@
       v-if="store.currentQuestion"
       class="flex h-64 w-11/12 max-w-4xl items-center justify-center rounded-xl bg-white text-center text-2xl font-semibold text-gray-700 shadow-lg"
     >
-      {{ store.currentQuestion.text }}
+      {{ store.currentQuestion.question.text }}
     </div>
     <div
       v-else
@@ -47,7 +47,11 @@
   const store = useQuestionsStore()
 
   const answerQuestion = (answer: string) => {
-    store.answer(store.currentQuestion, answer)
+    store.answer(
+      store.currentQuestion.acquiredBundle,
+      store.currentQuestion.question,
+      answer
+    )
     store.nextQuestion()
   }
 </script>

@@ -17,16 +17,20 @@ export const useQuestionsStore = defineStore('questions', () => {
   // init dependencies
   const user = useUserStore()
 
-  const { acquiredBundles } = storeToRefs(useQuestionBundlesStore())
+  const acquiredBundlesStore = useQuestionBundlesStore()
+  const { acquiredBundles } = storeToRefs(acquiredBundlesStore)
 
   // build a question queue
   const questions = computed(() => {
-    const questions: Question[] = []
+    const questions: {
+      question: Question
+      acquiredBundle: AcquiredQuestionBundle
+    }[] = []
     acquiredBundles.value.forEach((acquiredBundle: AcquiredQuestionBundle) => {
       questions.push(
-        ...Object.values(acquiredBundle.bundle.questions).filter((q) =>
-          notAnsweredByUser(q, user.id)
-        )
+        ...Object.values(acquiredBundle.bundle.questions)
+          .filter((q) => notAnsweredByUser(q, user.id))
+          .map((q) => ({ question: q, acquiredBundle: acquiredBundle }))
       )
     })
     return questions
@@ -41,7 +45,7 @@ export const useQuestionsStore = defineStore('questions', () => {
 
   // Actions
   const answer = (
-    acquiredBundleId: string,
+    acquiredBundle: AcquiredQuestionBundle,
     acquiredQuestion: AcquiredQuestion,
     answer: string
   ) => {
@@ -50,9 +54,13 @@ export const useQuestionsStore = defineStore('questions', () => {
       createdAt: new Date().toISOString(),
     }
     console.log(
-      `Answered: ${answer} for question: ${acquiredQuestion.text} (as user ${user.id})`
+      `Answered: ${answer} for question ${acquiredBundle.id}.${acquiredQuestion.id}: ${acquiredQuestion.text} (as user ${user.id})`
     )
-    // Save the answer or handle it as needed (e.g., store it in a database)
+    acquiredBundlesStore.updateAnswer(
+      acquiredBundle.id,
+      acquiredQuestion.id,
+      answer
+    )
   }
   const nextQuestion = () => {
     if (currentIndex.value < questions.value.length) {
