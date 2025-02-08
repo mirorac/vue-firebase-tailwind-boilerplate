@@ -1,12 +1,15 @@
 // src/stores/questionBundles.ts
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type {
   AcquiredQuestion,
   AcquiredQuestionBundle,
   QuestionBundle,
 } from '@/types/questions'
 import { useUserStore } from '@/stores/user'
+import { addDoc, onSnapshot, query, where } from 'firebase/firestore'
+import { acquiredBundlesCollection } from '~/plugins/firebase/db'
+import type { LinkedUsers } from '~/types/users'
 
 const staticBundles: QuestionBundle[] = [
   {
@@ -170,7 +173,7 @@ const staticBundles: QuestionBundle[] = [
 
 const transformToAcquiredBundle = (
   bundle: QuestionBundle,
-  users: string[]
+  link: LinkedUsers
 ): AcquiredQuestionBundle => {
   const bundleCopy: QuestionBundle<AcquiredQuestion> = JSON.parse(
     JSON.stringify(bundle)
@@ -180,7 +183,8 @@ const transformToAcquiredBundle = (
   })
   return {
     bundleId: bundle.id,
-    users,
+    linkId: link.id,
+    users: link.users,
     bundle: bundleCopy,
     createdAt: new Date().toISOString(),
   }
@@ -193,7 +197,10 @@ export const useQuestionBundlesStore = defineStore('questionBundles', () => {
 
   // State
   const bundles = ref<QuestionBundle[]>(staticBundles)
-  const acquiredBundles = ref<AcquiredQuestionBundle[]>([])
+  const acquiredBundles = ref(new Map<string, AcquiredQuestionBundle>())
+  const acquiredBundlesArray = computed(() =>
+    Array.from(acquiredBundles.value.values())
+  )
 
   // Actions
   const getList = (): QuestionBundle[] => {
@@ -205,13 +212,36 @@ export const useQuestionBundlesStore = defineStore('questionBundles', () => {
   }
 
   const isAcquired = (id: string) =>
-    acquiredBundles.value.some((acquired) => acquired.bundleId === id)
+    acquiredBundlesArray.value.some((acquired) => acquired.bundleId == id)
 
   const acquire = (bundle: QuestionBundle) => {
     if (!isAcquired(bundle.id)) {
-      acquiredBundles.value.push(transformToAcquiredBundle(bundle, [user.id]))
+      addDoc(
+        acquiredBundlesCollection,
+        transformToAcquiredBundle(bundle, user.link)
+      )
       console.log('added questions budnle: ', bundle.id)
     }
+  }
+
+  const syncAcquiredBundles = async () => {
+    await user.untilLinked()
+    const q = query(
+      acquiredBundlesCollection,
+      where('linkId', '==', user.link.id)
+    )
+    const stopSync = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        switch (change.type) {
+          case 'added':
+          case 'modified':
+            acquiredBundles.value.set(change.doc.id, change.doc.data())
+            break
+          case 'removed':
+            acquiredBundles.value.delete(change.doc.id)
+        }
+      })
+    })
   }
 
   const isMatch = (a: string, b: string) =>
@@ -226,22 +256,23 @@ export const useQuestionBundlesStore = defineStore('questionBundles', () => {
    * @returns An array of questions where at least two answers match.
    */
   const getMatches = () => {
-    return acquiredBundles.value.flatMap((acquiredBundle) =>
-      Object.values(acquiredBundle.bundle.questions).filter((question) =>
-        Object.values(question.answers).some((answer, index, answers) =>
-          answers
-            .slice(index + 1)
-            .some((otherAnswer) => isMatch(answer.answer, otherAnswer.answer))
+    return Array.from(acquiredBundles.value.values()).flatMap(
+      (acquiredBundle) =>
+        Object.values(acquiredBundle.bundle.questions).filter((question) =>
+          Object.values(question.answers).some((answer, index, answers) =>
+            answers
+              .slice(index + 1)
+              .some((otherAnswer) => isMatch(answer.answer, otherAnswer.answer))
+          )
         )
-      )
     )
   }
 
-  acquire(bundles.value[0])
+  syncAcquiredBundles()
 
   return {
     bundles,
-    acquiredBundles,
+    acquiredBundles: acquiredBundlesArray,
     getList,
     getBundle,
     acquire,

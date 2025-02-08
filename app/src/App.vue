@@ -2,10 +2,7 @@
   <!-- <QuestionAnswering></QuestionAnswering> -->
   <!-- <QuestionBundles></QuestionBundles> -->
   <div class="flex h-dvh flex-col">
-    <div>
-      <button @click="switchUser">switch user</button>
-      {{ user.link?.id }}
-    </div>
+    <div>{{ user.id }} | {{ user.isLinked }}</div>
     <div class="h-[90%] overflow-y-scroll">
       <RouterView />
     </div>
@@ -49,9 +46,13 @@
   const route = useRoute()
 
   const user = useUserStore()
-  const switchUser = () => {
-    const newUser = user.id == 'A' ? 'B' : 'A'
-    user.signOut()
-    user.signIn({ id: newUser })
+
+  if (user.id == 'D2qdymE0F4NwuEWM78xMXrzavrrk') {
+    user.createLinkToUser('tmg1og6zgfr')
   }
 </script>
+<style>
+  .firebase-emulator-warning {
+    display: none;
+  }
+</style>

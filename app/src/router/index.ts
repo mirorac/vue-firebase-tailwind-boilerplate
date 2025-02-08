@@ -4,6 +4,7 @@ import QuestionBundles from '~/components/QuestionBundles.vue'
 import AnswersList from '~/components/AnswersList.vue'
 import MatchesList from '~/components/MatchesList.vue'
 import { useUserStore } from '~/stores/user'
+import { signInAnonymously } from '~/plugins/firebase/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,8 +16,7 @@ const router = createRouter({
       beforeEnter: async (to, from, next) => {
         const user = useUserStore()
         if (!user.isSigned()) {
-          const userId = to.query.user as string | undefined
-          user.signIn({ id: userId || 'A' })
+          signInAnonymously()
           await user.untilSigned()
         }
         next()

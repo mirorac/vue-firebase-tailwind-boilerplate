@@ -40,7 +40,11 @@ export const useQuestionsStore = defineStore('questions', () => {
   )
 
   // Actions
-  const answer = (acquiredQuestion: AcquiredQuestion, answer: string) => {
+  const answer = (
+    acquiredBundleId: string,
+    acquiredQuestion: AcquiredQuestion,
+    answer: string
+  ) => {
     acquiredQuestion.answers[user.id] = {
       answer,
       createdAt: new Date().toISOString(),

@@ -25,6 +25,7 @@ export type AcquiredQuestion = Question & {
 
 export type AcquiredQuestionBundle = {
   bundleId: string
+  linkId: string
   users: string[]
   bundle: QuestionBundle<AcquiredQuestion>
   createdAt: string
