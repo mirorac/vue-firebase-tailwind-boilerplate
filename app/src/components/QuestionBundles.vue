@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div class="p-4">
     <h1 class="mb-4 text-2xl font-bold">Question Bundles</h1>
     <ul>
       <li
         v-for="bundle in bundles"
         :key="bundle.id"
-        class="mx-4 my-6 rounded border border-gray-300 p-4"
+        class="my-6 rounded border border-gray-300 p-4"
       >
         <h2 class="mb-2 text-xl font-semibold">{{ bundle.title }}</h2>
         <p class="mb-2 text-gray-700">{{ bundle.description }}</p>
@@ -21,7 +21,7 @@
         </button>
         <div
           v-else
-          class="rounded bg-green-500 px-4 py-2 text-white hover:bg-red-600"
+          class="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-700"
         >
           Acquired
         </div>

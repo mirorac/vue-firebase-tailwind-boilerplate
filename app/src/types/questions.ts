@@ -1,3 +1,5 @@
+import { Timestamp } from '@firebase/firestore-types'
+
 export type Question = {
   id: string
   themes: string[]
@@ -11,14 +13,14 @@ export type QuestionBundle<T extends Question | AcquiredQuestion = Question> = {
   description: string
   themes: string[]
   questions: { [questionId: string]: T }
-  createdAt: string
+  createdAt: Timestamp
 }
 
 export type AcquiredQuestion = Question & {
   answers: {
     [user: string]: {
       answer: string
-      createdAt: string
+      createdAt: Timestamp
     }
   }
 }
@@ -28,5 +30,5 @@ export type AcquiredQuestionBundle = {
   linkId: string
   users: string[]
   bundle: QuestionBundle<AcquiredQuestion>
-  createdAt: string
+  createdAt: Timestamp
 }

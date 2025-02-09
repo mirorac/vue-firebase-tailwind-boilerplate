@@ -33,7 +33,7 @@ type UserLinkSyncState = {
 // Create the store
 export const useUserStore = defineStore('userStore', () => {
   // State
-  const auth = ref<any>({
+  const auth = ref({
     user: null,
     claims: null,
     stopSyncCallback: null,
@@ -216,10 +216,11 @@ export const useUserStore = defineStore('userStore', () => {
 })
 
 type UserStore = ReturnType<typeof useUserStore>
-type SignedUserStore = Omit<UserStore, 'user' | 'link' | 'id'> & {
+type SignedUserStore = Omit<UserStore, 'user' | 'link' | 'id' | 'data'> & {
   id: Exclude<UserStore['id'], undefined>
   user: Exclude<UserStore['user'], null>
   link: Exclude<UserStore['link'], null>
+  data: Exclude<UserStore['data'], null>
 }
 /**
  * A wrapper around `useUserStore` that guarantees the user is authenticated.

@@ -1,6 +1,5 @@
 <template>
   <div class="flex h-dvh flex-col">
-    <div>{{ user.id }} | {{ user.isLinked }}</div>
     <div class="h-[90%] overflow-y-scroll">
       <RouterView />
     </div>
@@ -21,9 +20,9 @@
         >Answers</RouterLink
       >
       <RouterLink
-        :to="{ name: 'bundles' }"
+        :to="{ name: 'profile' }"
         class="rounded-md border bg-white p-4"
-        >Bundles</RouterLink
+        >Profile</RouterLink
       >
     </div>
   </div>

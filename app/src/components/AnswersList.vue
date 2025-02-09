@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class="p-4">
     <h1 class="mb-4 text-2xl font-bold">Answers</h1>
     <section
       v-for="acquired in store.acquiredBundles"
       :key="acquired.bundleId"
-      class="mx-4 my-6 rounded border border-gray-300 p-4"
+      class="my-6 rounded border border-gray-300 p-4"
     >
       <header @click="toggleBundle(acquired.bundleId)" class="cursor-pointer">
         <h2 class="mb-2 text-xl font-semibold">{{ acquired.bundle.title }}</h2>
@@ -17,7 +17,10 @@
         <template v-for="(q, id) in acquired.bundle.questions" :key="q.id">
           <li v-if="q.answers[user.id]" class="pt-4">
             <h3 class="font-bold">{{ q.text }}</h3>
-            <p>{{ q.answers[user.id].answer }}</p>
+            <p>
+              You: {{ q.answers[user.id].answer }}, partner:
+              {{ q.answers[partnerId]?.answer || '-' }}
+            </p>
           </li>
         </template>
       </ul>
@@ -28,10 +31,10 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import { useQuestionBundlesStore } from '@/stores/questionBundles'
-  import { useUserStore } from '@/stores/user'
+  import { useSignedUserStore } from '@/stores/user'
 
   // temporary static user ID
-  const user = useUserStore()
+  const user = useSignedUserStore()
 
   // Access the store
   const store = useQuestionBundlesStore()
@@ -39,6 +42,7 @@
   // State to track expanded bundles
   const expandedBundles = ref<string[]>([])
 
+  const partnerId = user.link.users.filter((id) => id !== user.id)[0]
   // Toggle the visibility of a bundle
   const toggleBundle = (bundleId: string) => {
     if (expandedBundles.value.includes(bundleId)) {
