@@ -6,7 +6,7 @@ import type {
   Question,
 } from '~/types/questions'
 import { useQuestionBundlesStore } from './questionBundles'
-import { useUserStore } from './user'
+import { useSignedUserStore } from './user'
 
 function notAnsweredByUser(question: AcquiredQuestion, user: string) {
   return !(user in question.answers)
@@ -14,7 +14,7 @@ function notAnsweredByUser(question: AcquiredQuestion, user: string) {
 
 export const useQuestionsStore = defineStore('questions', () => {
   // init dependencies
-  const user = useUserStore()
+  const user = useSignedUserStore()
 
   const acquiredBundlesStore = useQuestionBundlesStore()
   const { acquiredBundles } = storeToRefs(acquiredBundlesStore)
@@ -22,7 +22,7 @@ export const useQuestionsStore = defineStore('questions', () => {
   // build a question queue
   const questions = computed(() => {
     const questions: {
-      question: Question
+      question: AcquiredQuestion
       acquiredBundle: AcquiredQuestionBundle
     }[] = []
     acquiredBundles.value.forEach((acquiredBundle: AcquiredQuestionBundle) => {

@@ -216,7 +216,8 @@ export const useUserStore = defineStore('userStore', () => {
 })
 
 type UserStore = ReturnType<typeof useUserStore>
-type SignedUserStore = Omit<UserStore, 'user' | 'link'> & {
+type SignedUserStore = Omit<UserStore, 'user' | 'link' | 'id'> & {
+  id: Exclude<UserStore['id'], undefined>
   user: Exclude<UserStore['user'], null>
   link: Exclude<UserStore['link'], null>
 }
