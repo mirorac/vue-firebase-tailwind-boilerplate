@@ -42,16 +42,17 @@ export const useUserStore = defineStore('userStore', () => {
   const user = ref<User | null>(null)
   const id = computed(() => user.value?.id)
   const userLink = ref<LinkedUsers | null>(null)
-  const userLinkSyncState = shallowRef<UserLinkSyncState>({
+  const userLinkSyncState = ref<UserLinkSyncState>({
     syncStarted: false,
     dataRetrieved: false,
     stopSyncCallback: null,
   })
+  const linkSyncStarted = ref(false)
 
   // Getters
-  const isSigned = (): boolean => {
+  const isSigned = computed((): boolean => {
     return user.value !== null
-  }
+  })
 
   const isLinked = computed((): boolean => {
     return !!userLink.value && userLink.value.users.length == 2
@@ -67,6 +68,10 @@ export const useUserStore = defineStore('userStore', () => {
 
   const untilLinked = async () => {
     return until(userLink).toBeTruthy()
+  }
+
+  const untilLinkStatusChecked = async () => {
+    return until(linkSyncStarted).toBeTruthy()
   }
 
   // Actions
@@ -143,7 +148,7 @@ export const useUserStore = defineStore('userStore', () => {
           where('users', 'array-contains', user.value.id)
         ),
         async (querySnapshot) => {
-          userLinkSyncState.value.syncStarted = true
+          linkSyncStarted.value = true
           if (querySnapshot.size == 1) {
             const docChange = querySnapshot.docChanges()[0]
             userLink.value = docChange.doc.data()
@@ -174,7 +179,7 @@ export const useUserStore = defineStore('userStore', () => {
 
   const createLinkToUser = async (linkingCode: string) => {
     // check if already linked
-    await until(() => userLinkSyncState.value.syncStarted).toBeTruthy()
+    await untilLinkStatusChecked()
     if (isLinked.value) {
       throw new Error('User is already linked with somebody.')
     }
@@ -203,11 +208,45 @@ export const useUserStore = defineStore('userStore', () => {
     signOut,
     untilSigned,
     untilLinked,
+    untilLinkStatusChecked,
     link: userLink,
     auth,
     createLinkToUser,
   }
 })
+
+type UserStore = ReturnType<typeof useUserStore>
+type SignedUserStore = Omit<UserStore, 'user' | 'link'> & {
+  user: Exclude<UserStore['user'], null>
+  link: Exclude<UserStore['link'], null>
+}
+/**
+ * A wrapper around `useUserStore` that guarantees the user is authenticated.
+ *
+ * This function should only be used in contexts where authentication is enforced
+ * (e.g., inside protected routes). It asserts that `user` is non-null, ensuring
+ * type safety when accessing user properties.
+ *
+ * @throws {Error} If the user is not authenticated.
+ * @returns {SignedUserStore} A modified version of the user store where `user` is always defined.
+ *
+ * @example
+ * ```ts
+ * import { useSignedUserStore } from '@/stores/signedUserStore';
+ *
+ * const store = useSignedUserStore();
+ * console.log(store.user.id); // ✅ No TypeScript warnings
+ * ```
+ */
+export function useSignedUserStore(): SignedUserStore {
+  const store = useUserStore()
+
+  if (!store.user) {
+    throw new Error('User is not authenticated!')
+  }
+
+  return store as SignedUserStore
+}
 
 /**
  * Listens on change in authentication status and invokes actions accordingly.

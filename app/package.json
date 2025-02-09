@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "emulate": "firebase emulators:start --only firestore,auth --import=./.firebase/emulator_export --export-on-exit",
+    "export_emulator": "firebase emulators:export ./.firebase/emulator_export",
     "deploy": "run-p build && firebase deploy --only hosting"
   },
   "dependencies": {

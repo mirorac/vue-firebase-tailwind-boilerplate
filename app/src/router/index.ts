@@ -3,6 +3,7 @@ import QuestionAnswering from '~/components/QuestionAnswering.vue'
 import QuestionBundles from '~/components/QuestionBundles.vue'
 import AnswersList from '~/components/AnswersList.vue'
 import MatchesList from '~/components/MatchesList.vue'
+import LinkUsers from '~/components/LinkUsers.vue'
 import { useUserStore } from '~/stores/user'
 import { signInAnonymously } from '~/plugins/firebase/auth'
 
@@ -15,12 +16,21 @@ const router = createRouter({
       component: QuestionAnswering,
       beforeEnter: async (to, from, next) => {
         const user = useUserStore()
-        if (!user.isSigned()) {
+        if (!user.isSigned) {
           signInAnonymously()
           await user.untilSigned()
         }
+        await user.untilLinkStatusChecked()
+        if (!user.isLinked) {
+          return next('/link') // Redirect to linking page
+        }
         next()
       },
+    },
+    {
+      path: '/link',
+      name: 'link',
+      component: LinkUsers, // Page where user links their account
     },
     {
       path: '/bundles',

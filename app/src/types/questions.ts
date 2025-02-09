@@ -1,7 +1,7 @@
 export type Question = {
   id: string
   themes: string[]
-  type: 'yes-maybe-no' | 'open'
+  type: 'matching' | 'open-ended' | 'get-to-know'
   text: string
 }
 

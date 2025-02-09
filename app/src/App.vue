@@ -1,6 +1,4 @@
 <template>
-  <!-- <QuestionAnswering></QuestionAnswering> -->
-  <!-- <QuestionBundles></QuestionBundles> -->
   <div class="flex h-dvh flex-col">
     <div>{{ user.id }} | {{ user.isLinked }}</div>
     <div class="h-[90%] overflow-y-scroll">
@@ -33,23 +31,9 @@
 
 <script setup lang="ts">
   import { RouterLink, RouterView, useRoute } from 'vue-router'
-  import QuestionAnswering from '~/components/QuestionAnswering.vue'
-  import QuestionBundles from '~/components/QuestionBundles.vue'
-
-  import { onMounted, watch } from 'vue'
-  import { watchOnce, until } from '@vueuse/core'
   import { useUserStore } from '~/stores/user'
-  import { useQuestionsStore } from '~/stores/questions'
-  import { useQuestionBundlesStore } from '~/stores/questionBundles'
-  import { storeToRefs } from 'pinia'
-
-  const route = useRoute()
 
   const user = useUserStore()
-
-  if (user.id == 'D2qdymE0F4NwuEWM78xMXrzavrrk') {
-    user.createLinkToUser('tmg1og6zgfr')
-  }
 </script>
 <style>
   .firebase-emulator-warning {

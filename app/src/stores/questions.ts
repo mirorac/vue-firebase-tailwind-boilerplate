@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import type {
   AcquiredQuestion,
@@ -6,7 +6,6 @@ import type {
   Question,
 } from '~/types/questions'
 import { useQuestionBundlesStore } from './questionBundles'
-import { storeToRefs } from 'pinia/dist/pinia'
 import { useUserStore } from './user'
 
 function notAnsweredByUser(question: AcquiredQuestion, user: string) {

@@ -6,7 +6,7 @@ import type {
   AcquiredQuestionBundle,
   QuestionBundle,
 } from '@/types/questions'
-import { useUserStore } from '@/stores/user'
+import { useSignedUserStore, useUserStore } from '@/stores/user'
 import {
   addDoc,
   doc,
@@ -200,7 +200,7 @@ const transformToAcquiredBundle = (
 
 export const useQuestionBundlesStore = defineStore('questionBundles', () => {
   // init dependencies
-  const user = useUserStore()
+  const user = useSignedUserStore()
   console.log('Bundles loaded for user: ', user.id)
 
   // State
@@ -272,12 +272,12 @@ export const useQuestionBundlesStore = defineStore('questionBundles', () => {
     (a == 'maybe' && b == 'yes')
 
   /**
-   * Get questions with matching answers within acquired bundles.
+   * questions with matching answers within acquired bundles.
    * A match is identified when a question contains at least two identical answers.
    *
    * @returns An array of questions where at least two answers match.
    */
-  const getMatches = () => {
+  const matches = computed(() => {
     return Array.from(acquiredBundles.value.values()).flatMap(
       (acquiredBundle) =>
         Object.values(acquiredBundle.bundle.questions).filter((question) =>
@@ -288,7 +288,7 @@ export const useQuestionBundlesStore = defineStore('questionBundles', () => {
           )
         )
     )
-  }
+  })
 
   syncAcquiredBundles()
 
@@ -299,7 +299,7 @@ export const useQuestionBundlesStore = defineStore('questionBundles', () => {
     getBundle,
     acquire,
     isAcquired,
-    getMatches,
+    matches,
     updateAnswer,
   }
 })
