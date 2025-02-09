@@ -1,1 +1,10 @@
 @import './tailwind.css';
+
+html,
+body {
+  overscroll-behavior: none;
+  touch-action: manipulation; /* Prevent unwanted gestures */
+  overflow: hidden; /* Optional: Prevent scrolling */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
